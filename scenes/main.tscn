@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://n2tdw78gsoa4"]
+
+[ext_resource type="PackedScene" uid="uid://cuqdpmwl7yi4c" path="res://scenes/levels/training_grounds_root.tscn" id="2_0wfyh"]
+
+[node name="Main" type="Node2D" unique_id=248197348]
+
+[node name="TrainingGroundsRoot" parent="." unique_id=519390946 instance=ExtResource("2_0wfyh")]
