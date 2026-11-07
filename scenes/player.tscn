@@ -195,8 +195,7 @@ texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_rfke3")
 animation = &"Hit"
 autoplay = "Idle"
-frame = 6
-frame_progress = 0.4797904
+frame_progress = 0.7279454
 
 [node name="jumpSound" type="AudioStreamPlayer2D" parent="." unique_id=762544890]
 stream = ExtResource("6_tuyoq")
