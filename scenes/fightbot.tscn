@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://6lwdymiegmkk"]
 
-[ext_resource type="Script" uid="uid://bbfy7u8dpsgrj" path="res://scripts/dummy.gd" id="1_oogy2"]
+[ext_resource type="Script" uid="uid://bbfy7u8dpsgrj" path="res://scripts/fightbot.gd" id="1_oogy2"]
 [ext_resource type="Texture2D" uid="uid://dxi0t4qk485jt" path="res://assets/images/fightbot/Fightbot-punch.png" id="2_x5jq1"]
 [ext_resource type="Texture2D" uid="uid://c8ihxqyv3202c" path="res://assets/images/fightbot/Fightbot-idle.png" id="3_finp5"]
 [ext_resource type="Texture2D" uid="uid://p3snvw41ohob" path="res://assets/images/fightbot/Fightbot-jump.png" id="4_h3auj"]
