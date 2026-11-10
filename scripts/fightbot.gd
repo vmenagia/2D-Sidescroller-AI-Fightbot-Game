@@ -17,9 +17,10 @@ var dash_direction: float = 1.0
 var can_dash: bool = true
 
 #Starting health
-var health: float = 50.0
-var brain = ONNXLoader.new() # AI brain model
+var health: float = 500.0
 
+# AI brain model
+var brain = ONNXLoader.new() 
 
 func _ready() -> void:
 	# Loading the brain
@@ -35,8 +36,8 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta;
 	
 	# x and y relaitve to the player
-	var rel_x: float = player.global_position.x - global_position.x
-	var rel_y: float = player.global_position.y - global_position.y
+	var rel_x: float = global_position.x - player.global_position.x
+	var rel_y: float = global_position.y - player.global_position.y
 	
 	#prediction 
 	var pred = brain.predict([rel_x/500, rel_y/500])
@@ -131,7 +132,7 @@ func decode_actions(pred) -> Array:
 	# attacks if attack_prob is > 0.5
 	var attack_prob = pred[4]
 	print("ATTACKPROB: "+str(pred[4]))
-	var attack = attack_prob > 0.5
+	var attack = attack_prob > 0.0
 	
 	# dashes if dash_prob is > 0.5
 	var dash_prob = pred[5]
