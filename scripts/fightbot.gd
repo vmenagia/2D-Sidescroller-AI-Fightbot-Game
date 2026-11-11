@@ -2,6 +2,9 @@ extends CharacterBody2D
 @onready var player: CharacterBody2D = $"../Player"
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 
+var is_fighting: bool = false
+var is_brain_loaded: bool = false
+
 # Default Movement Stuff
 const SPEED = 300.0
 const JUMP_VELOCITY = -550.0
@@ -20,28 +23,34 @@ var can_dash: bool = true
 var health: float = 500.0
 
 # AI brain model
-var brain = ONNXLoader.new() 
+var brain 
 
 func _ready() -> void:
 	# Loading the brain
-	brain.load_model(ProjectSettings.globalize_path("res://models/bot_brain.onnx"))
-
+	brain = ONNXLoader.new()
+	if FileAccess.file_exists("res://models/bot_brain.onnx"):
+		brain.load_model(ProjectSettings.globalize_path("res://models/bot_brain.onnx"))
+		is_brain_loaded = true
 
 func _physics_process(delta: float) -> void:
 	
-	if not player:
+	if not player or not is_brain_loaded:
 		return
 	
 	if not is_on_floor() and current_state != State.DASH:
 		velocity += get_gravity() * delta;
+		
+	if(is_fighting):
+		# x and y relaitve to the player
+		var rel_x: float = global_position.x - player.global_position.x
+		var rel_y: float = global_position.y - player.global_position.y
 	
-	# x and y relaitve to the player
-	var rel_x: float = global_position.x - player.global_position.x
-	var rel_y: float = global_position.y - player.global_position.y
-	
-	#prediction 
-	var pred = brain.predict([rel_x/500, rel_y/500])
-	execute_actions(pred) # calling the execute_actions function
+		#prediction 
+		var pred = brain.predict([rel_x/500, rel_y/500])
+		execute_actions(pred) # calling the execute_actions function
+	else:
+		current_state = State.IDLE
+		animated_sprite_2d.animation = "Idle"
 
 	move_and_slide()
 
@@ -160,4 +169,8 @@ func start_attack() -> void:
 	
 	await get_tree().create_timer(0.3).timeout
 	current_state = State.IDLE
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("record"):
+		is_fighting = !is_fighting
 	
