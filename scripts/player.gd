@@ -18,6 +18,9 @@ const DASH_DURATION = 0.2
 var dash_direction: float = 1.0
 var can_dash: bool = true
 
+#Starting health
+var health: float = 500.0
+
 func _physics_process(delta: float) -> void:
 	
 	# Add the gravity.
@@ -107,3 +110,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			sparring_recorder.stop_recording()
 		else:
 			sparring_recorder.start_recording()
+			
+func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> void:
+	health -= amount
+	
+	velocity = knockback_vector
+	
+	modulate = Color.RED
+	await get_tree().create_timer(0.1).timeout
+	modulate = Color.WHITE
+	
+	if health < 0.0:
+		queue_free()

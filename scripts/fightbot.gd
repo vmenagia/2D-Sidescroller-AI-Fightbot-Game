@@ -1,6 +1,7 @@
 extends CharacterBody2D
 @onready var player: CharacterBody2D = $"../Player"
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
+@onready var hitbox_collision: CollisionShape2D = $Hitbox/CollisionShape2D
 
 var is_fighting: bool = false
 var is_brain_loaded: bool = false
@@ -35,6 +36,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	
 	if not player or not is_brain_loaded:
+		current_state = State.IDLE
+		animated_sprite_2d.animation = "Idle"
 		return
 	
 	if not is_on_floor() and current_state != State.DASH:
@@ -161,16 +164,27 @@ func start_dash() -> void:
 	
 func start_attack() -> void:
 	
-	#var facing = 1
-	#if animated_sprite_2d.flip_h: facing = -1
+	var facing = -1
+	if animated_sprite_2d.flip_h: facing = 1
+	$Hitbox.scale.x = facing
+	
+	hitbox_collision.disabled = false
 	
 	current_state = State.ATTACK
 	animated_sprite_2d.animation = "Hit"
-	
 	await get_tree().create_timer(0.3).timeout
+	
+	hitbox_collision.disabled = true
 	current_state = State.IDLE
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("record"):
 		is_fighting = !is_fighting
 	
+
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	var target = area.get_parent()
+	if target and target.has_method("take_damage") and target != self:
+		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0
+		var knockback: Vector2 = Vector2(hit_direction * 400.0, -200.0)
+		target.take_damage(15.0, knockback)

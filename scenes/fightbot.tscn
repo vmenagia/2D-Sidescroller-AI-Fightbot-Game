@@ -182,6 +182,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oogy2"]
+size = Vector2(64, 31)
+
 [node name="Fightbot" type="CharacterBody2D" unique_id=1012322407]
 script = ExtResource("1_oogy2")
 
@@ -194,11 +197,23 @@ shape = SubResource("RectangleShape2D_rfke3")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=2027956118]
 position = Vector2(0, 18.5)
 shape = SubResource("RectangleShape2D_rd0xb")
+disabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=740734488]
 texture_filter = 1
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_rfke3")
-animation = &"Idle"
+animation = &"Hit"
 autoplay = "Idle"
+frame = 4
+frame_progress = 0.840218
 flip_h = true
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=1496755542]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=153933144]
+position = Vector2(-26, 32.5)
+shape = SubResource("RectangleShape2D_oogy2")
+disabled = true
+
+[connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]

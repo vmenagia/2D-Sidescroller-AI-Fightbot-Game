@@ -187,6 +187,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
 size = Vector2(19, 10)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tuyoq"]
+size = Vector2(14, 24)
+
 [node name="Player" type="CharacterBody2D" unique_id=1416533164]
 script = ExtResource("1_qlg0r")
 
@@ -206,5 +209,11 @@ stream = ExtResource("6_tuyoq")
 position = Vector2(4.5, 4)
 shape = SubResource("RectangleShape2D_rfke3")
 disabled = true
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=383807374]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1432377357]
+position = Vector2(0, 4)
+shape = SubResource("RectangleShape2D_tuyoq")
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
