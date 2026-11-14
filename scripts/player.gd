@@ -5,8 +5,12 @@ extends CharacterBody2D
 @onready var sparring_recorder: Node2D = $"../SparringRecorder"
 
 # Finite State Machine states
-enum State {IDLE, RUN, JUMP, ATTACK, DASH}
+enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN}
 var current_state = State.IDLE
+
+# Hitstun stuff
+var state_timer: float = 0.0 
+const HITSTUN_DURATION = 0.25
 
 # Default Movement Stuff
 const SPEED = 300.0
@@ -26,6 +30,11 @@ func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor() and current_state != State.DASH:
 		velocity += get_gravity() * delta;
+
+	if state_timer > 0.0:
+		state_timer -= delta 
+		if state_timer <= 0.0:
+			current_state = State.IDLE
 
 	# Managing movement depending on the state we are in
 	match current_state:
@@ -69,6 +78,9 @@ func _physics_process(delta: float) -> void:
 			
 		State.ATTACK:
 			velocity.x = 0
+			
+		State.HITSTUN:
+			move_toward(velocity.x, 0, 800.0*delta)
 
 	move_and_slide()
 
@@ -115,6 +127,11 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 	health -= amount
 	
 	velocity = knockback_vector
+	
+	state_timer = HITSTUN_DURATION
+	hitbox_collision.set_deferred("disabled", true)
+	current_state = State.HITSTUN
+	animated_sprite_2d.animation = "Idle"
 	
 	modulate = Color.RED
 	await get_tree().create_timer(0.1).timeout

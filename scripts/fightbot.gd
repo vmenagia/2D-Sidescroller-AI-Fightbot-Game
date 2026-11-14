@@ -11,8 +11,12 @@ const SPEED = 300.0
 const JUMP_VELOCITY = -550.0
 
 # Finite State Machine states
-enum State {IDLE, RUN, JUMP, ATTACK, DASH}
+enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN}
 var current_state = State.IDLE
+
+# Hitstun stuff
+var state_timer: float = 0.0 
+const HITSTUN_DURATION = 0.25
 
 # Dash Settings
 const DASH_SPEED = 650.0
@@ -50,7 +54,13 @@ func _physics_process(delta: float) -> void:
 	
 		#prediction 
 		var pred = brain.predict([rel_x/500, rel_y/500])
-		execute_actions(pred) # calling the execute_actions function
+		
+		if state_timer > 0.0:
+			state_timer -= delta 
+			if state_timer <= 0.0:
+				current_state = State.IDLE
+		
+		execute_actions(pred, delta) # calling the execute_actions function
 	else:
 		current_state = State.IDLE
 		animated_sprite_2d.animation = "Idle"
@@ -59,6 +69,11 @@ func _physics_process(delta: float) -> void:
 
 func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> void:
 	health -= amount
+	
+	state_timer = HITSTUN_DURATION
+	hitbox_collision.set_deferred("disabled", true)
+	current_state = State.HITSTUN
+	animated_sprite_2d.animation = "Idle"
 	
 	velocity = knockback_vector
 	
@@ -70,7 +85,7 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 		queue_free()
 
 # this function performs movement according to the ais prediction
-func execute_actions(pred) -> void:
+func execute_actions(pred, delta) -> void:
 	
 	var actions = decode_actions(pred)
 	print("PREDICTIONS PLS BE NORMAL: "+str(actions))
@@ -124,6 +139,8 @@ func execute_actions(pred) -> void:
 			
 		State.ATTACK:
 			velocity.x = 0
+		State.HITSTUN:
+			move_toward(velocity.x, 0, 800.0*delta)
 	
 func decode_actions(pred) -> Array:
 	
