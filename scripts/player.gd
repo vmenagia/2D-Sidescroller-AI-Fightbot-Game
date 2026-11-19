@@ -5,7 +5,7 @@ extends CharacterBody2D
 @onready var sparring_recorder: Node2D = $"../SparringRecorder"
 
 # Finite State Machine states
-enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN}
+enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN, BLOCK}
 var current_state = State.IDLE
 
 # Hitstun stuff
@@ -71,6 +71,10 @@ func _physics_process(delta: float) -> void:
 				start_dash()
 			elif Input.is_action_just_pressed("hit"):
 				start_attack()
+			elif Input.is_action_pressed("block"):
+				current_state = State.BLOCK	
+				animated_sprite_2d.animation = "Block"
+				
 		
 		State.DASH:
 			velocity.x = dash_direction * DASH_SPEED
@@ -80,7 +84,11 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0
 			
 		State.HITSTUN:
-			move_toward(velocity.x, 0, 800.0*delta)
+			velocity.x = move_toward(velocity.x, 0, 800.0*delta)
+		State.BLOCK:
+			velocity.x = 0 
+			if not Input.is_action_pressed("block"):
+				current_state = State.IDLE
 
 	move_and_slide()
 
@@ -115,6 +123,7 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0
 		var knockback: Vector2 = Vector2(hit_direction * 400.0, -200.0)
 		target.take_damage(15.0, knockback)
+		#apply_hitstop()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("record"):
@@ -124,18 +133,30 @@ func _unhandled_input(event: InputEvent) -> void:
 			sparring_recorder.start_recording()
 			
 func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> void:
-	health -= amount
 	
-	velocity = knockback_vector
+	if current_state == State.BLOCK:
+		
+		modulate = Color.CYAN
+		get_tree().create_timer(0.1).timeout.connect(func(): modulate = Color.WHITE)
+		
+	else:
+		health -= amount
 	
-	state_timer = HITSTUN_DURATION
-	hitbox_collision.set_deferred("disabled", true)
-	current_state = State.HITSTUN
-	animated_sprite_2d.animation = "Idle"
+		velocity = knockback_vector
 	
-	modulate = Color.RED
-	await get_tree().create_timer(0.1).timeout
-	modulate = Color.WHITE
+		state_timer = HITSTUN_DURATION
+		hitbox_collision.set_deferred("disabled", true)
+		current_state = State.HITSTUN
+		animated_sprite_2d.animation = "Idle"
+	
+		modulate = Color.RED
+		await get_tree().create_timer(0.1).timeout
+		modulate = Color.WHITE
 	
 	if health < 0.0:
 		queue_free()
+
+func apply_hitstop(duration: float = 0.6) -> void:
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0

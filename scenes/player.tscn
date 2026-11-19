@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://c2xhrnhm7dfaj" path="res://assets/images/player/16x32 Run-Sheet.png" id="4_fjrip"]
 [ext_resource type="AudioStream" uid="uid://f2pqlq2kg3qi" path="res://assets/sounds/jump.wav" id="6_tuyoq"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_tuyoq"]
+atlas = ExtResource("1_dqkch")
+region = Rect2(192, 64, 32, 32)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_smehm"]
 atlas = ExtResource("1_dqkch")
 region = Rect2(0, 32, 32, 32)
@@ -97,6 +101,14 @@ region = Rect2(160, 64, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rfke3"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tuyoq")
+}],
+"loop": 1,
+"name": &"Block",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_smehm")
@@ -196,9 +208,8 @@ script = ExtResource("1_qlg0r")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=980255805]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_rfke3")
-animation = &"Hit"
+animation = &"Block"
 autoplay = "Idle"
-frame_progress = 0.7279454
 
 [node name="jumpSound" type="AudioStreamPlayer2D" parent="." unique_id=762544890]
 stream = ExtResource("6_tuyoq")

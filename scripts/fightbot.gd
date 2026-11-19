@@ -11,7 +11,7 @@ const SPEED = 300.0
 const JUMP_VELOCITY = -550.0
 
 # Finite State Machine states
-enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN}
+enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN, BLOCK}
 var current_state = State.IDLE
 
 # Hitstun stuff
@@ -28,18 +28,20 @@ var can_dash: bool = true
 var health: float = 500.0
 
 # AI brain model
-var brain 
+const ONNXInference = preload("res://addons/godot_rl_agents/onnx/csharp/ONNXInference.cs")
+var brain
 
 func _ready() -> void:
 	# Loading the brain
-	brain = ONNXLoader.new()
+	hitbox_collision.disabled = true
+	brain = ONNXInference.new()
 	if FileAccess.file_exists("res://models/bot_brain.onnx"):
-		brain.load_model(ProjectSettings.globalize_path("res://models/bot_brain.onnx"))
+		brain.Initialize("res://models/bot_brain.onnx", 1)
 		is_brain_loaded = true
 
 func _physics_process(delta: float) -> void:
 	
-	if not player or not is_brain_loaded:
+	if not is_instance_valid(player) or not is_brain_loaded:
 		current_state = State.IDLE
 		animated_sprite_2d.animation = "Idle"
 		return
@@ -49,18 +51,20 @@ func _physics_process(delta: float) -> void:
 		
 	if(is_fighting):
 		# x and y relaitve to the player
-		var rel_x: float = global_position.x - player.global_position.x
-		var rel_y: float = global_position.y - player.global_position.y
-	
-		#prediction 
-		var pred = brain.predict([rel_x/500, rel_y/500])
+		var rel_x: float = (global_position.x - player.global_position.x) / 500.0
+		var rel_y: float = (global_position.y - player.global_position.y) / 500.0
+
+		var obs: Array[float] = [rel_x, rel_y]
+		var pred = brain.Predict(obs)
 		
 		if state_timer > 0.0:
 			state_timer -= delta 
 			if state_timer <= 0.0:
 				current_state = State.IDLE
 		
-		execute_actions(pred, delta) # calling the execute_actions function
+		if pred != null:
+			execute_actions(pred, delta) # calling the execute_actions function
+		
 	else:
 		current_state = State.IDLE
 		animated_sprite_2d.animation = "Idle"
@@ -140,7 +144,7 @@ func execute_actions(pred, delta) -> void:
 		State.ATTACK:
 			velocity.x = 0
 		State.HITSTUN:
-			move_toward(velocity.x, 0, 800.0*delta)
+			velocity.x = move_toward(velocity.x, 0, 800.0*delta)
 	
 func decode_actions(pred) -> Array:
 	
@@ -205,3 +209,13 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0
 		var knockback: Vector2 = Vector2(hit_direction * 400.0, -200.0)
 		target.take_damage(15.0, knockback)
+		#apply_hitstop()
+		
+func apply_hitstop(duration: float = 0.6) -> void:
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0
+	
+func _exit_tree() -> void:
+	if brain != null:
+		brain.FreeDisposables()
