@@ -186,7 +186,7 @@ physics_layer_0/collision_mask = 2
 sources/2 = SubResource("TileSetAtlasSource_mlx2e")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
-size = Vector2(13.800003, 25.400005)
+size = Vector2(9.999996, 23.800007)
 
 [node name="TrainingGroundsRoot" type="Node2D" unique_id=519390946]
 
@@ -210,13 +210,13 @@ scale = Vector2(5, 5)
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=752429075]
-position = Vector2(-0.8999977, 4.300003)
+position = Vector2(-0.19999695, 3.9000015)
 scale = Vector2(0.99999976, 0.99999976)
 shape = SubResource("RectangleShape2D_rfke3")
 metadata/_edit_group_ = true
 
 [node name="Fightbot" parent="." unique_id=1012322407 instance=ExtResource("3_douu5")]
-position = Vector2(547, 385)
+position = Vector2(1101, 425)
 
 [node name="SparringRecorder" type="Node2D" parent="." unique_id=1092142760 node_paths=PackedStringArray("player", "bot")]
 script = ExtResource("4_nwk0p")

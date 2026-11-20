@@ -14,7 +14,7 @@ const HITSTUN_DURATION = 0.25
 
 # Default Movement Stuff
 const SPEED = 300.0
-const JUMP_VELOCITY = -550.0
+const JUMP_VELOCITY = -950.0
 
 # Dash Settings
 const DASH_SPEED = 650.0
@@ -24,6 +24,16 @@ var can_dash: bool = true
 
 #Starting health
 var health: float = 500.0
+
+# Attack stuff
+var can_attack: bool = true
+const ATTACK_STARTUP = 0.08
+const ATTACK_ACTIVE = 0.08
+const ATTACK_RECOVERY = 0.22
+const ATTACK_COOLDOWN = 0.35
+
+func _ready() -> void:
+	hitbox_collision.disabled = true
 
 func _physics_process(delta: float) -> void:
 	
@@ -69,7 +79,7 @@ func _physics_process(delta: float) -> void:
 			# Dashing and hitting things while mmoving
 			if Input.is_action_just_pressed("dash") and can_dash:
 				start_dash()
-			elif Input.is_action_just_pressed("hit"):
+			elif Input.is_action_just_pressed("hit") and can_attack:
 				start_attack()
 			elif Input.is_action_pressed("block"):
 				current_state = State.BLOCK	
@@ -97,33 +107,53 @@ func start_dash() -> void:
 	can_dash = false
 	
 	await get_tree().create_timer(DASH_DURATION).timeout
-	current_state = State.IDLE
+	if current_state == State.DASH:
+		current_state = State.IDLE
 	
 	await get_tree().create_timer(0.4).timeout
 	can_dash = true
 	
 func start_attack() -> void:
 	
+	can_attack = false
+	
 	var facing = 1
 	if animated_sprite_2d.flip_h: facing = -1
 	$Hitbox.scale.x = facing
 	
-	hitbox_collision.disabled = false
-	
 	current_state = State.ATTACK
 	animated_sprite_2d.animation = "Hit"
-	await get_tree().create_timer(0.3).timeout
 	
+	await get_tree().create_timer(ATTACK_STARTUP).timeout
+	if current_state != State.ATTACK:
+		start_attack_cooldown()
+		return
+	
+	hitbox_collision.disabled = false
+	await get_tree().create_timer(ATTACK_ACTIVE).timeout
 	hitbox_collision.disabled = true
-	current_state = State.IDLE
+	
+	if current_state != State.ATTACK:
+		start_attack_cooldown()
+		return
+		
+	await get_tree().create_timer(ATTACK_RECOVERY).timeout
+	if current_state == State.ATTACK:
+		current_state = State.IDLE
+	
+	start_attack_cooldown()
+	
+func start_attack_cooldown() -> void:
+	await get_tree().create_timer(ATTACK_COOLDOWN).timeout
+	can_attack = true
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	var target = area.get_parent()
 	if target and target.has_method("take_damage") and target != self:
 		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0
-		var knockback: Vector2 = Vector2(hit_direction * 400.0, -200.0)
+		var knockback: Vector2 = Vector2(hit_direction * 900.0, -200.0)
 		target.take_damage(15.0, knockback)
-		#apply_hitstop()
+		apply_hitstop()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("record"):
@@ -156,7 +186,7 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 	if health < 0.0:
 		queue_free()
 
-func apply_hitstop(duration: float = 0.6) -> void:
+func apply_hitstop(duration: float = 0.06) -> void:
 	Engine.time_scale = 0.05
 	await get_tree().create_timer(duration, true, false, true).timeout
 	Engine.time_scale = 1.0

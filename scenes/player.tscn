@@ -197,10 +197,10 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
-size = Vector2(19, 10)
+size = Vector2(19, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tuyoq"]
-size = Vector2(14, 24)
+size = Vector2(10, 24)
 
 [node name="Player" type="CharacterBody2D" unique_id=1416533164]
 script = ExtResource("1_qlg0r")
@@ -208,7 +208,7 @@ script = ExtResource("1_qlg0r")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=980255805]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_rfke3")
-animation = &"Block"
+animation = &"Idle"
 autoplay = "Idle"
 
 [node name="jumpSound" type="AudioStreamPlayer2D" parent="." unique_id=762544890]
@@ -217,7 +217,7 @@ stream = ExtResource("6_tuyoq")
 [node name="Hitbox" type="Area2D" parent="." unique_id=669551325]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1006705987]
-position = Vector2(4.5, 4)
+position = Vector2(4.5, 6)
 shape = SubResource("RectangleShape2D_rfke3")
 disabled = true
 

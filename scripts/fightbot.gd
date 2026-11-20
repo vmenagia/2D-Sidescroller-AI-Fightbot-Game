@@ -3,12 +3,13 @@ extends CharacterBody2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox_collision: CollisionShape2D = $Hitbox/CollisionShape2D
 
+# These are for fighting and to check if the onnx model is loaded
 var is_fighting: bool = false
 var is_brain_loaded: bool = false
 
 # Default Movement Stuff
 const SPEED = 300.0
-const JUMP_VELOCITY = -550.0
+const JUMP_VELOCITY = -950.0
 
 # Finite State Machine states
 enum State {IDLE, RUN, JUMP, ATTACK, DASH, HITSTUN, BLOCK}
@@ -26,6 +27,13 @@ var can_dash: bool = true
 
 #Starting health
 var health: float = 500.0
+
+# Attack stuff
+var can_attack: bool = true
+const ATTACK_STARTUP = 0.13
+const ATTACK_ACTIVE = 0.08
+const ATTACK_RECOVERY = 0.22
+const ATTACK_COOLDOWN = 0.35
 
 # AI brain model
 const ONNXInference = preload("res://addons/godot_rl_agents/onnx/csharp/ONNXInference.cs")
@@ -165,7 +173,7 @@ func decode_actions(pred) -> Array:
 	# attacks if attack_prob is > 0.5
 	var attack_prob = pred[4]
 	print("ATTACKPROB: "+str(pred[4]))
-	var attack = attack_prob > 0.0
+	var attack = attack_prob > 0.0 and can_attack
 	
 	# dashes if dash_prob is > 0.5
 	var dash_prob = pred[5]
@@ -178,25 +186,45 @@ func start_dash() -> void:
 	can_dash = false
 	
 	await get_tree().create_timer(DASH_DURATION).timeout
-	current_state = State.IDLE
+	if current_state == State.DASH:
+		current_state = State.IDLE
 	
 	await get_tree().create_timer(0.4).timeout
 	can_dash = true
 	
 func start_attack() -> void:
 	
+	can_attack = false
+	
 	var facing = -1
 	if animated_sprite_2d.flip_h: facing = 1
 	$Hitbox.scale.x = facing
 	
-	hitbox_collision.disabled = false
-	
 	current_state = State.ATTACK
 	animated_sprite_2d.animation = "Hit"
-	await get_tree().create_timer(0.3).timeout
 	
+	await get_tree().create_timer(ATTACK_STARTUP).timeout
+	if current_state != State.ATTACK:
+		start_attack_cooldown()
+		return
+	
+	hitbox_collision.disabled = false
+	await get_tree().create_timer(ATTACK_ACTIVE).timeout
 	hitbox_collision.disabled = true
-	current_state = State.IDLE
+	
+	if current_state != State.ATTACK:
+		start_attack_cooldown()
+		return
+		
+	await get_tree().create_timer(ATTACK_RECOVERY).timeout
+	if current_state == State.ATTACK:
+		current_state = State.IDLE
+	
+	start_attack_cooldown()
+	
+func start_attack_cooldown() -> void:
+	await get_tree().create_timer(ATTACK_COOLDOWN).timeout
+	can_attack = true
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("record"):
@@ -207,11 +235,11 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 	var target = area.get_parent()
 	if target and target.has_method("take_damage") and target != self:
 		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0
-		var knockback: Vector2 = Vector2(hit_direction * 400.0, -200.0)
+		var knockback: Vector2 = Vector2(hit_direction * 900.0, -200.0)
 		target.take_damage(15.0, knockback)
-		#apply_hitstop()
+		apply_hitstop()
 		
-func apply_hitstop(duration: float = 0.6) -> void:
+func apply_hitstop(duration: float = 0.06) -> void:
 	Engine.time_scale = 0.05
 	await get_tree().create_timer(duration, true, false, true).timeout
 	Engine.time_scale = 1.0
