@@ -7,6 +7,15 @@
 [ext_resource type="Texture2D" uid="uid://c2xhrnhm7dfaj" path="res://assets/images/player/16x32 Run-Sheet.png" id="4_fjrip"]
 [ext_resource type="AudioStream" uid="uid://f2pqlq2kg3qi" path="res://assets/sounds/jump.wav" id="6_tuyoq"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
+size = Vector2(19, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tuyoq"]
+size = Vector2(11, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fjrip"]
+size = Vector2(9.999996, 23.800007)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_tuyoq"]
 atlas = ExtResource("1_dqkch")
 region = Rect2(192, 64, 32, 32)
@@ -196,25 +205,16 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
-size = Vector2(19, 14)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tuyoq"]
-size = Vector2(10, 24)
-
 [node name="Player" type="CharacterBody2D" unique_id=1416533164]
 script = ExtResource("1_qlg0r")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=980255805]
-texture_filter = 1
-sprite_frames = SubResource("SpriteFrames_rfke3")
-animation = &"Idle"
-autoplay = "Idle"
 
 [node name="jumpSound" type="AudioStreamPlayer2D" parent="." unique_id=762544890]
 stream = ExtResource("6_tuyoq")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=669551325]
+collision_layer = 0
+collision_mask = 4
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1006705987]
 position = Vector2(4.5, 6)
@@ -222,9 +222,24 @@ shape = SubResource("RectangleShape2D_rfke3")
 disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=383807374]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1432377357]
-position = Vector2(0, 4)
+position = Vector2(-0.5, 4)
 shape = SubResource("RectangleShape2D_tuyoq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=251959396]
+position = Vector2(0, 4)
+scale = Vector2(0.99999976, 0.99999976)
+shape = SubResource("RectangleShape2D_fjrip")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=980255805]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_rfke3")
+animation = &"Idle"
+autoplay = "Idle"
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]

@@ -148,6 +148,8 @@ func start_attack_cooldown() -> void:
 	can_attack = true
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
+	print(area.name)
+	print(area.get_parent().name)
 	var target = area.get_parent()
 	if target and target.has_method("take_damage") and target != self:
 		var hit_direction: float = 1.0 if target.global_position.x > global_position.x else -1.0

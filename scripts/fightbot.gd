@@ -30,7 +30,7 @@ var health: float = 500.0
 
 # Attack stuff
 var can_attack: bool = true
-const ATTACK_STARTUP = 0.13
+const ATTACK_STARTUP = 0.08
 const ATTACK_ACTIVE = 0.08
 const ATTACK_RECOVERY = 0.22
 const ATTACK_COOLDOWN = 0.35
@@ -81,7 +81,7 @@ func _physics_process(delta: float) -> void:
 
 func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> void:
 	health -= amount
-	
+	print(health)
 	state_timer = HITSTUN_DURATION
 	hitbox_collision.set_deferred("disabled", true)
 	current_state = State.HITSTUN

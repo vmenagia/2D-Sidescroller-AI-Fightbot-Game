@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://c1pcpbdwfi825" path="res://scenes/player.tscn" id="2_8xky8"]
 [ext_resource type="PackedScene" uid="uid://6lwdymiegmkk" path="res://scenes/fightbot.tscn" id="3_douu5"]
 [ext_resource type="Script" uid="uid://c1e2fofa2msl" path="res://scripts/sparring_recorder.gd" id="4_nwk0p"]
+[ext_resource type="Texture2D" uid="uid://8ggocbrulrec" path="res://assets/ui/healthbar/healthbarUnder.png" id="5_2mygb"]
+[ext_resource type="Texture2D" uid="uid://bostft3dfb1k3" path="res://assets/ui/healthbar/healthbarOver.png" id="6_ifjgd"]
+[ext_resource type="Texture2D" uid="uid://cxdrp5pru6m04" path="res://assets/ui/healthbar/healthbar.png" id="7_m7v38"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x4p4q"]
 texture = ExtResource("1_nwk0p")
@@ -185,9 +188,6 @@ physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 2
 sources/2 = SubResource("TileSetAtlasSource_mlx2e")
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_rfke3"]
-size = Vector2(9.999996, 23.800007)
-
 [node name="TrainingGroundsRoot" type="Node2D" unique_id=519390946]
 
 [node name="Foreground" type="TileMapLayer" parent="." unique_id=1014229308]
@@ -209,12 +209,6 @@ position = Vector2(211, 384)
 scale = Vector2(5, 5)
 metadata/_edit_group_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=752429075]
-position = Vector2(-0.19999695, 3.9000015)
-scale = Vector2(0.99999976, 0.99999976)
-shape = SubResource("RectangleShape2D_rfke3")
-metadata/_edit_group_ = true
-
 [node name="Fightbot" parent="." unique_id=1012322407 instance=ExtResource("3_douu5")]
 position = Vector2(1101, 425)
 
@@ -222,3 +216,32 @@ position = Vector2(1101, 425)
 script = ExtResource("4_nwk0p")
 player = NodePath("../Player")
 bot = NodePath("../Fightbot")
+
+[node name="HealthBarLayer" type="CanvasLayer" parent="." unique_id=115608780]
+
+[node name="PlayerHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=698682129]
+texture_filter = 1
+offset_left = -2.0
+offset_top = -16.0
+offset_right = 68.0
+offset_bottom = 24.0
+scale = Vector2(6, 6)
+value = 100.0
+texture_under = ExtResource("5_2mygb")
+texture_over = ExtResource("6_ifjgd")
+texture_progress = ExtResource("7_m7v38")
+tint_progress = Color(0.9341509, 0.21946314, 1.347661e-06, 1)
+
+[node name="BotHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=322810822]
+texture_filter = 1
+offset_left = 1036.0
+offset_top = -16.0
+offset_right = 1106.0
+offset_bottom = 24.0
+scale = Vector2(-6, 6)
+pivot_offset = Vector2(35, 0)
+value = 100.0
+texture_under = ExtResource("5_2mygb")
+texture_over = ExtResource("6_ifjgd")
+texture_progress = ExtResource("7_m7v38")
+tint_progress = Color(0.106401995, 0.50327224, 1.1799055, 1)

@@ -205,21 +205,26 @@ position = Vector2(0.5, 23.25)
 shape = SubResource("RectangleShape2D_rfke3")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=475781920]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=2027956118]
 position = Vector2(0, 18.5)
 shape = SubResource("RectangleShape2D_rd0xb")
-disabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=740734488]
 texture_filter = 1
 scale = Vector2(5, 5)
 sprite_frames = SubResource("SpriteFrames_rfke3")
-animation = &"Block"
+animation = &"Idle"
 autoplay = "Idle"
 flip_h = true
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1496755542]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=153933144]
 position = Vector2(-26, 32.5)
