@@ -171,11 +171,11 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 		
 		modulate = Color.CYAN
 		get_tree().create_timer(0.1).timeout.connect(func(): modulate = Color.WHITE)
-		
+		get_viewport().get_camera_2d().shake(3.5)
 	else:
 		health -= amount
 		healthChanged.emit()
-	
+		get_viewport().get_camera_2d().shake(9.0)
 		velocity = knockback_vector
 	
 		state_timer = HITSTUN_DURATION
@@ -183,8 +183,10 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 		current_state = State.HITSTUN
 		animated_sprite_2d.animation = "Idle"
 	
+		modulate = Color(2.5, 2.5, 2.5)
+		await get_tree().create_timer(0.04).timeout
 		modulate = Color.RED
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0.08).timeout
 		modulate = Color.WHITE
 	
 	if health < 0.0:
