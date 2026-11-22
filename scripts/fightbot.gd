@@ -27,6 +27,7 @@ var can_dash: bool = true
 
 #Starting health
 var health: float = 500.0
+signal healthChanged
 
 # Attack stuff
 var can_attack: bool = true
@@ -81,6 +82,7 @@ func _physics_process(delta: float) -> void:
 
 func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> void:
 	health -= amount
+	healthChanged.emit()
 	print(health)
 	state_timer = HITSTUN_DURATION
 	hitbox_collision.set_deferred("disabled", true)

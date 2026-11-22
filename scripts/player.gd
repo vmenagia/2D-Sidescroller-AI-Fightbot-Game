@@ -24,6 +24,7 @@ var can_dash: bool = true
 
 #Starting health
 var health: float = 500.0
+signal healthChanged
 
 # Attack stuff
 var can_attack: bool = true
@@ -173,6 +174,7 @@ func take_damage(amount: float, knockback_vector: Vector2 = Vector2.ZERO) -> voi
 		
 	else:
 		health -= amount
+		healthChanged.emit()
 	
 		velocity = knockback_vector
 	

@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://8ggocbrulrec" path="res://assets/ui/healthbar/healthbarUnder.png" id="5_2mygb"]
 [ext_resource type="Texture2D" uid="uid://bostft3dfb1k3" path="res://assets/ui/healthbar/healthbarOver.png" id="6_ifjgd"]
 [ext_resource type="Texture2D" uid="uid://cxdrp5pru6m04" path="res://assets/ui/healthbar/healthbar.png" id="7_m7v38"]
+[ext_resource type="Script" uid="uid://5fw3s7f2l8gy" path="res://scripts/player_health.gd" id="8_ifjgd"]
+[ext_resource type="Script" uid="uid://b7br2w64nfacm" path="res://scripts/bot_health.gd" id="9_m7v38"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_x4p4q"]
 texture = ExtResource("1_nwk0p")
@@ -219,20 +221,23 @@ bot = NodePath("../Fightbot")
 
 [node name="HealthBarLayer" type="CanvasLayer" parent="." unique_id=115608780]
 
-[node name="PlayerHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=698682129]
+[node name="PlayerHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=698682129 node_paths=PackedStringArray("player")]
 texture_filter = 1
 offset_left = -2.0
 offset_top = -16.0
 offset_right = 68.0
 offset_bottom = 24.0
 scale = Vector2(6, 6)
-value = 100.0
+max_value = 500.0
+value = 500.0
 texture_under = ExtResource("5_2mygb")
 texture_over = ExtResource("6_ifjgd")
 texture_progress = ExtResource("7_m7v38")
 tint_progress = Color(0.9341509, 0.21946314, 1.347661e-06, 1)
+script = ExtResource("8_ifjgd")
+player = NodePath("../../Player")
 
-[node name="BotHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=322810822]
+[node name="BotHealth" type="TextureProgressBar" parent="HealthBarLayer" unique_id=322810822 node_paths=PackedStringArray("bot")]
 texture_filter = 1
 offset_left = 1036.0
 offset_top = -16.0
@@ -240,8 +245,11 @@ offset_right = 1106.0
 offset_bottom = 24.0
 scale = Vector2(-6, 6)
 pivot_offset = Vector2(35, 0)
-value = 100.0
+max_value = 500.0
+value = 500.0
 texture_under = ExtResource("5_2mygb")
 texture_over = ExtResource("6_ifjgd")
 texture_progress = ExtResource("7_m7v38")
 tint_progress = Color(0.106401995, 0.50327224, 1.1799055, 1)
+script = ExtResource("9_m7v38")
+bot = NodePath("../../Fightbot")
